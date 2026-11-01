@@ -28,4 +28,4 @@ Türkçe: otomasyon, dil eşleşmesinin yapısını ve paket bütünlüğünü s
 
 ## Continuous integration
 
-The GitHub workflow runs the same checks with read-only repository permissions, no supplied secrets, no dependency installer, and a pinned checkout action. Pull requests cannot publish or deploy through this workflow. The runner's Node runtime is used; the action SHA was resolved from the official actions/checkout v4 reference on 2026-11-01. Revisit the runtime and action during maintenance.
+The GitHub workflow runs the same checks on Ubuntu 24.04 with read-only repository permissions, no supplied secrets, no dependency installer, and a pinned checkout action. Pull requests cannot publish or deploy through this workflow. The runner's Node runtime is used; the action SHA was resolved from the official actions/checkout v7.0.1 reference on 2026-11-01, and its action manifest declares Node 24. Revisit the runtime and action during maintenance.
