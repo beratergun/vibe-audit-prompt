@@ -1,0 +1,12 @@
+# Application audit evidence can contain private data. Do not publish it here.
+docs/audits/
+audit-evidence/
+*.har
+*.log
+.env
+.env.*
+!.env.example
+node_modules/
+.DS_Store
+Thumbs.db
+work/

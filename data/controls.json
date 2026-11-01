@@ -1,0 +1,893 @@
+{
+  "version": "1.0.0",
+  "groups": [
+    {
+      "id": "SCOPE",
+      "tr": "Kapsam ve mimari",
+      "en": "Scope and architecture",
+      "controls": [
+        {
+          "id": "SCOPE-01",
+          "tr": "Tüm deploy edilebilir bileşenleri, branch/commit ve çalışma değişikliklerini kaydet; incelenmeyen bileşen açıkça listelensin.",
+          "en": "Record every deployable component, branch/commit, and working change; explicitly list unreviewed components."
+        },
+        {
+          "id": "SCOPE-02",
+          "tr": "Route kaydı ile API envanterini karşılaştır; gizli admin, eski sürüm, server action ve iç endpoint atlanmasın.",
+          "en": "Compare route registration with the API inventory; include hidden admin, legacy versions, server actions, and internal endpoints."
+        },
+        {
+          "id": "SCOPE-03",
+          "tr": "İstemci→sunucu→depo→sağlayıcı veri akışını izle; her güven sınırında doğrulayan kontrol ve sahibi belirlensin.",
+          "en": "Trace client→server→store→provider flows; identify the enforcing control and owner at every trust boundary."
+        },
+        {
+          "id": "SCOPE-04",
+          "tr": "Manifest, lockfile ve gerçek runtime sürümlerini karşılaştır; destek dışı veya farklı ortam sürümleri için etkiyi doğrula.",
+          "en": "Compare manifests, lockfiles, and actual runtimes; verify impact of unsupported versions and environment drift."
+        },
+        {
+          "id": "SCOPE-05",
+          "tr": "Önceki raporlar, kabul edilmiş riskler ve istisnaları bul; süresi geçmiş istisnayı sessizce geçerli sayma.",
+          "en": "Locate previous reports, risk acceptances, and exceptions; do not silently preserve expired exceptions."
+        },
+        {
+          "id": "SCOPE-06",
+          "tr": "Test veritabanı, anahtar, DNS ve sağlayıcı hesabını doğrula; test komutları üretime veya gerçek ileti teslimine ulaşmasın.",
+          "en": "Verify test database, keys, DNS, and provider accounts; test commands must not reach production or real message delivery."
+        }
+      ]
+    },
+    {
+      "id": "SECRET",
+      "tr": "Sırlar ve kimlik bilgileri",
+      "en": "Secrets and credentials",
+      "controls": [
+        {
+          "id": "SECRET-01",
+          "tr": "Çalışma ağacı, izlenen dosyalar ve erişilebilir Git geçmişini maskeli tara; kapsam kesildiyse temiz sonuç iddia etme.",
+          "en": "Scan working files, tracked content, and reachable Git history with redaction; truncated coverage cannot support a clean-history claim."
+        },
+        {
+          "id": "SECRET-02",
+          "tr": "Üretim bundle, mobil paket, container katmanı, source map ve artefaktları incele; sunucu sırları dağıtılan istemciye girmesin.",
+          "en": "Inspect production bundles, mobile packages, image layers, source maps, and artifacts; server secrets must not reach distributed clients."
+        },
+        {
+          "id": "SECRET-03",
+          "tr": "Public/publishable anahtarları sağlayıcı belgesiyle sınıflandır; gerçek yetkileri, kaynak kısıtları ve sunucu veri kurallarını doğrula.",
+          "en": "Classify publishable keys using provider documentation; verify actual privileges, restrictions, and server data policies."
+        },
+        {
+          "id": "SECRET-04",
+          "tr": "Eksik ortam değişkeni ve demo parola fallback'ini yerelde dene; üretim modu güvensiz varsayılanla açılmasın.",
+          "en": "Test missing environment variables and demo-password fallbacks locally; production mode must not start with insecure defaults."
+        },
+        {
+          "id": "SECRET-05",
+          "tr": "CI, build logu, hata yanıtı, analitik ve crash raporunda sentetik sır işareti ara; hassas değer dışarı taşınmasın.",
+          "en": "Trace synthetic secret markers through CI/build logs, errors, analytics, and crash reports; sensitive values must not escape."
+        },
+        {
+          "id": "SECRET-06",
+          "tr": "Sızan sırrın kapsamı ve rotasyon bağımlılıklarını çıkar; silinen satırı kapatılmış olay sayma, iptal doğrulamasını sahibine bağla.",
+          "en": "Map leaked-secret scope and rotation dependencies; deletion is not incident closure, and revocation verification needs an owner."
+        }
+      ]
+    },
+    {
+      "id": "AUTHN",
+      "tr": "Kimlik doğrulama ve hesap kurtarma",
+      "en": "Authentication and recovery",
+      "controls": [
+        {
+          "id": "AUTHN-01",
+          "tr": "Kayıt/girişte gerçek sağlayıcı doğrulamasını izle; test bypass, varsayılan yönetici ve koşulsuz başarılı mock üretimde etkin olmasın.",
+          "en": "Trace real provider checks in signup/login; test bypasses, default administrators, and unconditional success mocks must not be active in production."
+        },
+        {
+          "id": "AUTHN-02",
+          "tr": "Parola saklamada sağlayıcı veya güncel uyarlamalı hash kullanımını doğrula; düz metin, geri çözülebilir saklama ve özel kriptoyu araştır.",
+          "en": "Verify provider-managed or current adaptive password hashing; investigate plaintext, reversible storage, and custom cryptography."
+        },
+        {
+          "id": "AUTHN-03",
+          "tr": "Sıfırlama/doğrulama bağlantısını sentetik hesapla tekrar kullan ve süresini geçir; tek kullanımlı, amaç ve hesaba bağlı olsun.",
+          "en": "Replay and expire reset/verification links for synthetic accounts; require single use and binding to purpose and account."
+        },
+        {
+          "id": "AUTHN-04",
+          "tr": "MFA kurulum, kurtarma ve kaldırmayı test et; düşük güvenli kurtarma yolu kritik işlemlerde MFA'yı atlatmasın.",
+          "en": "Test MFA enrollment, recovery, and removal; weaker recovery paths must not bypass MFA for critical operations."
+        },
+        {
+          "id": "AUTHN-05",
+          "tr": "OAuth/OIDC state, nonce, PKCE, issuer, audience ve redirect URI doğrulamasını akışa göre test et; callback karışıklığı reddedilsin.",
+          "en": "Test OAuth/OIDC state, nonce, PKCE, issuer, audience, and redirect validation as applicable; reject callback confusion."
+        },
+        {
+          "id": "AUTHN-06",
+          "tr": "SSO bağlantılama, e-posta değişimi ve hesap birleştirmede kimliği yeniden doğrula; doğrulanmamış e-posta başka hesabı ele geçiremesin.",
+          "en": "Require identity verification for SSO linking, email changes, and account merging; unverified email must not take over another account."
+        }
+      ]
+    },
+    {
+      "id": "SESSION",
+      "tr": "Oturum ve token yaşam döngüsü",
+      "en": "Session and token lifecycle",
+      "controls": [
+        {
+          "id": "SESSION-01",
+          "tr": "Token imzası, algoritma, issuer/audience ve zaman iddialarını bozuk fixture ile test et; decode etmek doğrulama yerine geçmesin.",
+          "en": "Test token signature, algorithm, issuer/audience, and time claims with malformed fixtures; decoding must not substitute for verification."
+        },
+        {
+          "id": "SESSION-02",
+          "tr": "Refresh rotasyonu, tekrar kullanım ve paralel yenilemeyi dene; çalınan eski token sınırsız oturum üretemesin.",
+          "en": "Test refresh rotation, reuse, and concurrent renewal; a stolen old token must not mint unlimited sessions."
+        },
+        {
+          "id": "SESSION-03",
+          "tr": "Çıkış, parola değişimi, hesap kapatma ve rol kaldırma sonrası eski oturumu kullan; belgelenmiş iptal politikası uygulansın.",
+          "en": "Reuse sessions after logout, password changes, deletion, and role revocation; enforce the documented revocation policy."
+        },
+        {
+          "id": "SESSION-04",
+          "tr": "Web token deposunu XSS/CSRF tehdit modeliyle değerlendir; cookie bayrakları ve kapsamı doğru olsun, storage değişimi akışları bozmasın.",
+          "en": "Assess web token storage against XSS/CSRF threats; verify cookie flags/scope and avoid storage changes that break flows."
+        },
+        {
+          "id": "SESSION-05",
+          "tr": "Cookie tabanlı değişikliklerde cross-site sentetik istek dene; CSRF/origin kontrolü mevcut mimaride sunucuda etkili olsun.",
+          "en": "Send synthetic cross-site mutations for cookie-based sessions; require effective server-side CSRF/origin controls for the architecture."
+        },
+        {
+          "id": "SESSION-06",
+          "tr": "Oturum sabitleme, boşta kalma, mutlak süre ve hassas işlemde yeniden doğrulamayı kontrol et; süreler sunucuda uygulansın.",
+          "en": "Check fixation, idle/absolute expiry, and step-up authentication; enforce time limits on the server."
+        }
+      ]
+    },
+    {
+      "id": "AUTHZ",
+      "tr": "Yetkilendirme ve tenant izolasyonu",
+      "en": "Authorization and tenant isolation",
+      "controls": [
+        {
+          "id": "AUTHZ-01",
+          "tr": "Anonim/A/B/tenant/rol matrisiyle kritik nesnelerde tüm CRUD ve export işlemlerini API üzerinden dene; yetkisiz veri veya yan etki olmasın.",
+          "en": "Exercise critical-object CRUD/export through the API across anonymous/A/B/tenant/role identities; prevent unauthorized data and side effects."
+        },
+        {
+          "id": "AUTHZ-02",
+          "tr": "İstemciden role, owner_id, tenant_id, is_admin ve fiyat gönder; alan bazlı yetki ve mass-assignment koruması sunucuda uygulansın.",
+          "en": "Submit client-supplied role, owner_id, tenant_id, is_admin, and prices; enforce field authorization and mass-assignment defenses server-side."
+        },
+        {
+          "id": "AUTHZ-03",
+          "tr": "Yönetim, destek ve impersonation uçlarını doğrudan çağır; ayrıcalık doğrulansın ve kritik destek işlemi denetlenebilir olsun.",
+          "en": "Call administrative, support, and impersonation endpoints directly; verify privilege and audit critical support actions."
+        },
+        {
+          "id": "AUTHZ-04",
+          "tr": "Liste, arama, sayaç, toplu işlem, rapor ve indirme yollarını sınırla; tek kayıt kontrolünü toplu uçlarla aşmak mümkün olmasın.",
+          "en": "Verify lists, search, counts, bulk operations, reports, and downloads; bulk paths must not bypass single-record authorization."
+        },
+        {
+          "id": "AUTHZ-05",
+          "tr": "Davet kabulü, üyelik kaldırma ve rol düşürmeyi test et; tahmin edilen davet veya eski cache ile tenant erişimi sürmesin.",
+          "en": "Test invitations, membership removal, and role downgrades; guessed invitations and stale caches must not preserve tenant access."
+        },
+        {
+          "id": "AUTHZ-06",
+          "tr": "Job, WebSocket, GraphQL resolver, server action ve dosya linkinde yetkiyi test et; HTTP middleware dışındaki yollar korunmuş olsun.",
+          "en": "Test authorization in jobs, WebSockets, resolvers, server actions, and file links; protect paths outside HTTP middleware."
+        }
+      ]
+    },
+    {
+      "id": "INPUT",
+      "tr": "Girdi ve enjeksiyon",
+      "en": "Input and injection",
+      "controls": [
+        {
+          "id": "INPUT-01",
+          "tr": "Sunucu şemalarında tür, uzunluk, aralık, Unicode, null, bilinmeyen alan ve iç içe yapıları sınırla; UI doğrulaması atlatılabilsin diye doğrudan test et.",
+          "en": "Bound server schema types, lengths, ranges, Unicode, nulls, unknown fields, and nesting; test directly around UI validation."
+        },
+        {
+          "id": "INPUT-02",
+          "tr": "SQL/NoSQL/ORM sorgusuna kullanıcı girdisi akışını izle; parametreler ve sorgu yapısı ayrı kalsın, ham çağrıyı tek başına açık sayma.",
+          "en": "Trace user input into SQL/NoSQL/ORM queries; separate parameters from query structure rather than flagging every raw call."
+        },
+        {
+          "id": "INPUT-03",
+          "tr": "Shell, template, eval, dinamik import ve süreç başlatmada zararsız işaretleyici kullan; girdi komut veya kod olarak yorumlanmasın.",
+          "en": "Use harmless markers at shell, template, eval, dynamic import, and process boundaries; input must not become commands or code."
+        },
+        {
+          "id": "INPUT-04",
+          "tr": "XML, YAML, nesne deserialization ve belge dönüştürme ayarlarını incele; dış entity, güvensiz nesne oluşturma ve sınırsız genişleme engellensin.",
+          "en": "Review XML/YAML/object deserialization and document conversion; prevent external entities, unsafe object creation, and unbounded expansion."
+        },
+        {
+          "id": "INPUT-05",
+          "tr": "Dosya yolu, arşiv açma, symlink ve canonicalization sınırlarını yerel fixture ile dene; işlem izinli kök dışına çıkmasın.",
+          "en": "Test file paths, archive extraction, symlinks, and canonicalization with local fixtures; operations must stay inside allowed roots."
+        },
+        {
+          "id": "INPUT-06",
+          "tr": "Header, log, e-posta şablonu ve CSV export girdilerini dene; satır enjeksiyonu, yanıltıcı log ve formül çalışması önlensin.",
+          "en": "Test header, log, email-template, and CSV-export inputs; prevent line injection, misleading logs, and spreadsheet formula execution."
+        }
+      ]
+    },
+    {
+      "id": "WEB",
+      "tr": "Web ve tarayıcı güvenliği",
+      "en": "Web and browser security",
+      "controls": [
+        {
+          "id": "WEB-01",
+          "tr": "HTML, Markdown, SVG, URL ve zengin metinde XSS veri akışını test et; bağlama uygun encode/sanitizasyon uygulanmış olsun.",
+          "en": "Test XSS flows through HTML, Markdown, SVG, URLs, and rich text; enforce context-appropriate encoding/sanitization."
+        },
+        {
+          "id": "WEB-02",
+          "tr": "CSP ve frame-ancestors politikasını gerçek sayfada doğrula; gereksiz wildcard/unsafe izinleri gerekçelendir, medya ve OAuth regresyonunu kontrol et.",
+          "en": "Validate CSP and frame-ancestors on real pages; justify broad/unsafe allowances and check media/OAuth regressions."
+        },
+        {
+          "id": "WEB-03",
+          "tr": "HTTPS, HSTS, MIME sniffing, referrer ve hassas cache başlıklarını uygun yüzeyde kontrol et; cross-origin izolasyonu gereksinime göre değerlendir.",
+          "en": "Check HTTPS/HSTS, MIME sniffing, referrer, and sensitive caching headers; assess cross-origin isolation according to requirements."
+        },
+        {
+          "id": "WEB-04",
+          "tr": "CORS'u izinli/izinsiz origin, credential ve preflight ile test et; CORS'u kimlik/yetki kontrolü sayma.",
+          "en": "Test CORS with allowed/disallowed origins, credentials, and preflight; do not treat CORS as authentication or authorization."
+        },
+        {
+          "id": "WEB-05",
+          "tr": "Redirect, postMessage, iframe, opener ve DOM clobbering kullanımını incele; origin/kaynak ve hedef doğrulaması etkili olsun.",
+          "en": "Review redirects, postMessage, iframes, opener behavior, and DOM clobbering; enforce source/origin and destination validation."
+        },
+        {
+          "id": "WEB-06",
+          "tr": "CDN/SSR/ISR cache'ini farklı kullanıcı ve tenantlarla dene; özel HTML, API yanıtı ve hata verisi başka oturuma sunulmasın.",
+          "en": "Exercise CDN/SSR/ISR caching across users and tenants; private HTML, API responses, and errors must not cross sessions."
+        }
+      ]
+    },
+    {
+      "id": "API",
+      "tr": "API sözleşmesi ve protokoller",
+      "en": "API contracts and protocols",
+      "controls": [
+        {
+          "id": "API-01",
+          "tr": "İstek/yanıt şeması ve content-type sınırlarını test et; bilinmeyen HTTP metodları veya versiyonlar korumayı atlatmasın.",
+          "en": "Test request/response schemas and content types; unexpected methods and API versions must not bypass controls."
+        },
+        {
+          "id": "API-02",
+          "tr": "Pagination, filtre, sort ve response alanlarını sınırla; istek sınırsız veri dökümü veya hassas alan yayılımı üretmesin.",
+          "en": "Bound pagination, filters, sorting, and response fields; requests must not cause unlimited exports or sensitive-field exposure."
+        },
+        {
+          "id": "API-03",
+          "tr": "GraphQL derinlik, maliyet, batching ve resolver yetkisini dene; tek HTTP isteği kota ve alan korumasını atlatmasın.",
+          "en": "Test GraphQL depth, cost, batching, and resolver authorization; one HTTP request must not bypass quotas or field protection."
+        },
+        {
+          "id": "API-04",
+          "tr": "WebSocket/SSE bağlantı, reconnect ve abonelikte oturum/tenant kontrolünü dene; iptal sonrası mesaj ve sınırsız bağlantı olmasın.",
+          "en": "Test WebSocket/SSE identity/tenant checks on connect, reconnect, and subscriptions; prevent post-revocation messages and unlimited connections."
+        },
+        {
+          "id": "API-05",
+          "tr": "Webhook ham body imzası, zaman penceresi, replay ve event kimliğini sandbox'ta dene; sahte veya yinelenen olay işlem üretmesin.",
+          "en": "Test raw-body webhook signatures, timestamps, replay, and event IDs in sandboxes; forged/duplicate events must not trigger work."
+        },
+        {
+          "id": "API-06",
+          "tr": "Proxy/gateway parser, forwarded header güveni ve cache anahtarlarını karşılaştır; istek karışıklığı ve sahte istemci kimliği riskini doğrula.",
+          "en": "Compare proxy/gateway parsing, forwarded-header trust, and cache keys; verify request confusion and spoofed-client risks."
+        }
+      ]
+    },
+    {
+      "id": "DATA",
+      "tr": "Veritabanı kuralları ve bütünlük",
+      "en": "Database policy and integrity",
+      "controls": [
+        {
+          "id": "DATA-01",
+          "tr": "Supabase/Postgres RLS için SELECT/INSERT/UPDATE/DELETE ve USING/WITH CHECK davranışını ayrı rollerle dene; politikayı yalnızca açık göründüğü için yeterli sayma.",
+          "en": "Test Supabase/Postgres RLS operations and USING/WITH CHECK across roles; enabled RLS alone does not prove correct policy."
+        },
+        {
+          "id": "DATA-02",
+          "tr": "View, SECURITY DEFINER fonksiyon, search_path, servis/admin SDK ve bypass rollerini incele; istemci yolu ayrıcalıklı veri erişimine dönüşmesin.",
+          "en": "Review views, SECURITY DEFINER functions, search_path, service/admin SDKs, and bypass roles; client paths must not gain privileged access."
+        },
+        {
+          "id": "DATA-03",
+          "tr": "Firebase Firestore/Realtime/Storage kurallarını emülatörde test et; açık wildcard, eski kural ve Admin SDK bypass'ı hesaba katılsın.",
+          "en": "Test Firebase Firestore/Realtime/Storage rules in emulators; account for public wildcards, stale rules, and Admin SDK bypass."
+        },
+        {
+          "id": "DATA-04",
+          "tr": "Veritabanı hesabı, ağ erişimi, TLS ve şema izinlerini incele; uygulama rutin iş için yönetici rolüne ihtiyaç duymasın.",
+          "en": "Review database accounts, network access, TLS, and schema grants; routine application work should not require administrative privileges."
+        },
+        {
+          "id": "DATA-05",
+          "tr": "Transaction, unique/foreign key, tutar ve durum invariant'larını eşzamanlı fixture ile test et; tutarsız veya çift kayıt oluşmasın.",
+          "en": "Test transactions, unique/foreign keys, amount and state invariants with concurrent fixtures; prevent inconsistent or duplicate records."
+        },
+        {
+          "id": "DATA-06",
+          "tr": "Göçleri boş ve önceki sürümün sentetik verisinde dene; uyumluluk, indeks kilidi, veri kaybı ve geri dönüş gereksinimi belirlensin.",
+          "en": "Test migrations against empty and previous-version synthetic data; assess compatibility, locking, data loss, and recovery requirements."
+        }
+      ]
+    },
+    {
+      "id": "FILE",
+      "tr": "Dosya ve nesne depolama",
+      "en": "Files and object storage",
+      "controls": [
+        {
+          "id": "FILE-01",
+          "tr": "Yüklemede boyut, sayı, uzantı, magic byte ve gerçek parser sınırlarını zararsız dosyalarla dene; yalnızca MIME başlığına güvenilmesin.",
+          "en": "Test upload size/count, extension, magic bytes, and parser bounds with harmless files; never rely on MIME headers alone."
+        },
+        {
+          "id": "FILE-02",
+          "tr": "Dosya adı/anahtar üretimi, overwrite ve yarışları test et; başka kullanıcı dosyası ezilmesin ve yürütülebilir içerik güvenli sunulsun.",
+          "en": "Test filename/key generation, overwrites, and races; prevent cross-user replacement and serve executable content safely."
+        },
+        {
+          "id": "FILE-03",
+          "tr": "Public/private bucket, listeleme, indirme ve silmeyi farklı hesaplarla test et; URL tahmini sahiplik kontrolünü atlatmasın.",
+          "en": "Test public/private buckets, listing, download, and deletion across accounts; guessed URLs must not bypass ownership checks."
+        },
+        {
+          "id": "FILE-04",
+          "tr": "Signed URL'nin kapsam, süre, yöntem ve yeniden kullanımını incele; süresi dolmuş veya farklı nesneye taşınmış imza geçerli olmasın.",
+          "en": "Review signed-URL scope, expiry, method, and reuse; expired or object-substituted signatures must not remain valid."
+        },
+        {
+          "id": "FILE-05",
+          "tr": "Resim/PDF/arşiv dönüştürmede boyut, süre, izolasyon ve metadata'yı dene; decompression bomb ve EXIF sızıntısını kontrollü fixture ile değerlendir.",
+          "en": "Test image/PDF/archive conversion bounds, timeouts, isolation, and metadata; assess decompression bombs and EXIF leakage with controlled fixtures."
+        },
+        {
+          "id": "FILE-06",
+          "tr": "Geçici dosya, karantina, başarısız upload ve hesap silme temizliğini doğrula; artık dosyalar veya yetkisiz preview'lar erişilebilir kalmasın.",
+          "en": "Verify cleanup of temporary/quarantined/failed uploads and deleted accounts; orphan files and unauthorized previews must not remain accessible."
+        }
+      ]
+    },
+    {
+      "id": "LOGIC",
+      "tr": "İş mantığı ve eşzamanlılık",
+      "en": "Business logic and concurrency",
+      "controls": [
+        {
+          "id": "LOGIC-01",
+          "tr": "Kritik durum geçişlerini sırayı atlayarak ve geriye alarak dene; sunucu izinli geçiş ve önkoşulları uygulasın.",
+          "en": "Skip and reverse critical workflow transitions; the server must enforce allowed states and prerequisites."
+        },
+        {
+          "id": "LOGIC-02",
+          "tr": "Tekrarlanan istek, timeout sonrası retry ve çift tıklamayı dene; yan etkiler amaçlanan idempotency kapsamı içinde bir kez oluşsun.",
+          "en": "Test duplicate requests, retries after timeouts, and double clicks; side effects must occur once within the intended idempotency scope."
+        },
+        {
+          "id": "LOGIC-03",
+          "tr": "Kontrollü paralel istekle stok, kupon, bakiye ve rezervasyon invariant'larını test et; check-then-act yarışı kuralı bozmasın.",
+          "en": "Use bounded concurrency for inventory, coupons, balances, and reservations; check-then-act races must not violate invariants."
+        },
+        {
+          "id": "LOGIC-04",
+          "tr": "Negatif/sıfır/aşırı değer, para birimi, yuvarlama, saat dilimi ve DST sınırlarını test et; iş hesabı deterministik ve doğru olsun.",
+          "en": "Test negative/zero/extreme values, currency, rounding, time zones, and DST; business calculations must remain correct and deterministic."
+        },
+        {
+          "id": "LOGIC-05",
+          "tr": "Feature flag, abonelik hakkı ve kullanım kotasını doğrudan API'de dene; istemci bayrağı veya eski cache ücretli yetki vermesin.",
+          "en": "Test feature flags, entitlements, and quotas directly through APIs; client flags or stale caches must not grant paid privileges."
+        },
+        {
+          "id": "LOGIC-06",
+          "tr": "Spam, sahte hesap, toplu veri toplama ve davet kötüye kullanımını modelle; koruma gerçek iş akışını ve erişilebilirliği korusun.",
+          "en": "Model spam, fake accounts, scraping, and invitation abuse; controls must preserve legitimate workflows and accessibility."
+        }
+      ]
+    },
+    {
+      "id": "PAY",
+      "tr": "Ödeme ve abonelik",
+      "en": "Payments and subscriptions",
+      "controls": [
+        {
+          "id": "PAY-01",
+          "tr": "Ürün/fiyat/indirim/vergi/para birimini sandbox'ta manipüle et; toplam tutar güvenilir sunucu kataloğundan hesaplansın.",
+          "en": "Manipulate product/price/discount/tax/currency in sandboxes; calculate totals from trusted server-side catalog data."
+        },
+        {
+          "id": "PAY-02",
+          "tr": "Başarı URL'sini ödemeden aç ve istemci success alanını değiştir; hak yalnızca doğrulanmış sağlayıcı olayıyla tanımlı kurala göre verilsin.",
+          "en": "Open success URLs without paying and alter client success fields; grant entitlements only under verified provider events and policy."
+        },
+        {
+          "id": "PAY-03",
+          "tr": "Webhook tekrarını ve sıra dışı teslimi dene; ödeme durumu gerilemesin, iki kez hizmet veya iade oluşmasın.",
+          "en": "Test duplicate and out-of-order payment events; prevent state regression and duplicate fulfillment or refunds."
+        },
+        {
+          "id": "PAY-04",
+          "tr": "İptal, yenileme, grace period, chargeback ve iade senaryolarını dene; arayüz, sağlayıcı ve backend hakkı tutarlı olsun.",
+          "en": "Test cancellation, renewal, grace periods, chargebacks, and refunds; align UI, provider, and backend entitlements."
+        },
+        {
+          "id": "PAY-05",
+          "tr": "Kart verisinin uygulama/log/analitiğe girip girmediğini izle; ödeme mimarisine göre PCI kapsam sorularını sorumluya ilet, sertifika iddia etme.",
+          "en": "Trace card data through application/logs/analytics; raise architecture-specific PCI scope questions without claiming certification."
+        },
+        {
+          "id": "PAY-06",
+          "tr": "Test/canlı anahtar, webhook endpoint ve müşteri kimliğini ayır; sandbox senaryoları gerçek ücretlendirme başlatmasın.",
+          "en": "Separate sandbox/live keys, webhook endpoints, and customer identities; sandbox tests must never initiate real charges."
+        }
+      ]
+    },
+    {
+      "id": "NET",
+      "tr": "Dış servis ve ağ sınırları",
+      "en": "Outbound services and network boundaries",
+      "controls": [
+        {
+          "id": "NET-01",
+          "tr": "URL alanını yerel stub, redirect ve farklı IP temsilleriyle test et; SSRF kontrolü çözümleme/bağlantı ve her yönlendirmede geçerli olsun.",
+          "en": "Test URL input using local stubs, redirects, and IP representations; SSRF controls must cover resolution/connection and every redirect."
+        },
+        {
+          "id": "NET-02",
+          "tr": "Outbound host/protokol/port izinlerini, zaman ve byte sınırlarını incele; indirme maliyeti ve iç ağ erişimi sınırlandırılsın.",
+          "en": "Review outbound host/protocol/port policy, timeouts, and byte limits; bound download costs and internal-network access."
+        },
+        {
+          "id": "NET-03",
+          "tr": "TLS sertifika/hostname doğrulamasını incele; verify=false veya herkesi kabul eden hata yolu üretimde kullanılmasın.",
+          "en": "Review TLS certificate/hostname verification; verify=false and accept-all error paths must not be enabled in production."
+        },
+        {
+          "id": "NET-04",
+          "tr": "Sağlayıcı timeout, 429, 5xx ve bozuk cevabını mock'la; sınırlı retry/backoff olsun, güvenlik hatasında fail-open oluşmasın.",
+          "en": "Mock provider timeouts, 429s, 5xx, and malformed responses; bound retries/backoff and avoid security fail-open behavior."
+        },
+        {
+          "id": "NET-05",
+          "tr": "Haricî API yanıtını güvenilmeyen girdi say; şema, yönlendirme, HTML ve dosya verisi downstream sınırları atlatmasın.",
+          "en": "Treat external API responses as untrusted; validate schemas, redirects, HTML, and files before downstream use."
+        },
+        {
+          "id": "NET-06",
+          "tr": "E-posta/SMS/push alıcısı, link, şablon ve provider yetkisini incele; saldırgan üçüncü kişilere sınırsız ileti gönderemesin.",
+          "en": "Review email/SMS/push recipients, links, templates, and provider privileges; prevent unlimited messaging to third parties."
+        }
+      ]
+    },
+    {
+      "id": "ABUSE",
+      "tr": "Kaynak, hız ve maliyet sınırları",
+      "en": "Resource, rate, and cost limits",
+      "controls": [
+        {
+          "id": "ABUSE-01",
+          "tr": "Auth, reset, arama, export, upload ve ücretli API yollarında yerel sınır testi yap; bütün pahalı yollar korunsun.",
+          "en": "Test local limits on auth, resets, search, exports, uploads, and paid APIs; cover every expensive path."
+        },
+        {
+          "id": "ABUSE-02",
+          "tr": "Kota anahtarını IP/hesap/tenant/işlem açısından değerlendir; sahte forwarded header veya hesap değişimiyle basit bypass olmasın.",
+          "en": "Assess quota keys across IP/account/tenant/action; prevent simple bypass through spoofed forwarding headers or account switching."
+        },
+        {
+          "id": "ABUSE-03",
+          "tr": "Çoklu replica/serverless örneğinde limiter durumunu incele; process içi sayaç dağıtık sınır diye sunulmasın.",
+          "en": "Review limiter state across replicas/serverless instances; do not describe per-process counters as distributed enforcement."
+        },
+        {
+          "id": "ABUSE-04",
+          "tr": "Body, regex, sorgu karmaşıklığı, sayfa sayısı, stream ve timeout sınırlarını dene; tek istek sınırsız CPU/bellek tüketmesin.",
+          "en": "Test body, regex, query complexity, page count, stream, and timeout limits; one request must not consume unbounded CPU/memory."
+        },
+        {
+          "id": "ABUSE-05",
+          "tr": "AI token/araç çağrısı ve ücretli servis için uygulama bütçesi, eşzamanlılık ve devre kesiciyi kontrol et; uyarıyı hard cap sayma.",
+          "en": "Check application budgets, concurrency, and circuit breakers for AI/tool/paid calls; a spending alert is not a hard cap."
+        },
+        {
+          "id": "ABUSE-06",
+          "tr": "Kota deposu veya sağlayıcı kesilince davranışı dene; güvenlik ve kullanılabilirlik tercihi açık, ölçülebilir ve iş riskine uygun olsun.",
+          "en": "Test quota-store/provider outages; make security/availability tradeoffs explicit, measurable, and appropriate to business risk."
+        }
+      ]
+    },
+    {
+      "id": "DEP",
+      "tr": "Bağımlılık ve tedarik zinciri",
+      "en": "Dependencies and supply chain",
+      "controls": [
+        {
+          "id": "DEP-01",
+          "tr": "Doğrudan/geçişli lockfile bağımlılıklarını güncel advisory ile tara; sürüm, erişilebilirlik ve istismar koşulunu doğrula, offline eksikliğini yaz.",
+          "en": "Scan direct/transitive locked dependencies against current advisories; verify versions/reachability/preconditions and disclose offline limits."
+        },
+        {
+          "id": "DEP-02",
+          "tr": "AI'ın önerdiği paket/ad/API gerçekten var mı doğrula; typosquatting, dependency confusion ve beklenmedik registry kaynağını araştır.",
+          "en": "Verify AI-suggested packages/names/APIs exist; investigate typosquatting, dependency confusion, and unexpected registries."
+        },
+        {
+          "id": "DEP-03",
+          "tr": "Install/postinstall/build scripti, binary indirme ve git bağımlılığını incele; kaynak/commit ve yürütme yetkisi izlenebilir olsun.",
+          "en": "Review install/postinstall/build scripts, binary downloads, and Git dependencies; preserve provenance/commit and execution accountability."
+        },
+        {
+          "id": "DEP-04",
+          "tr": "Lockfile bütünlüğü, registry kapsamı, imza/provenance ve SBOM üretimini değerlendir; kullanılan artefakt kaynakla ilişkilendirilebilsin.",
+          "en": "Assess lockfile integrity, registry scope, signatures/provenance, and SBOMs; link shipped artifacts to their sources."
+        },
+        {
+          "id": "DEP-05",
+          "tr": "CDN script, font, analytics SDK ve uzaktan kod yüklemeyi incele; bütünlük, sürüm, veri aktarımı ve kesinti etkisi belirlensin.",
+          "en": "Review CDN scripts, fonts, analytics SDKs, and remote code; assess integrity, versions, transfers, and outage impact."
+        },
+        {
+          "id": "DEP-06",
+          "tr": "Lisans, NOTICE, asset/font/model/dataset hakları ve terk edilmiş paketleri envantere al; uyumsuzluk soruları delille hukuk incelemesine taşınsın.",
+          "en": "Inventory licenses, notices, asset/font/model/dataset rights, and abandoned packages; raise evidenced compatibility questions for legal review."
+        }
+      ]
+    },
+    {
+      "id": "CICD",
+      "tr": "CI/CD ve geliştirme ajanı",
+      "en": "CI/CD and coding agents",
+      "controls": [
+        {
+          "id": "CICD-01",
+          "tr": "PR event, fork, pull_request_target ve checkout akışını izle; güvenilmeyen kod sır veya write token ile çalışmasın.",
+          "en": "Trace PR/fork/pull_request_target and checkout flows; untrusted code must not run with secrets or write tokens."
+        },
+        {
+          "id": "CICD-02",
+          "tr": "Workflow izinleri, OIDC subject/audience, environment ve runner sınırlarını incele; release yetkisi en az ayrıcalıkla sınırlandırılsın.",
+          "en": "Review workflow permissions, OIDC subject/audience, environments, and runner boundaries; minimize release privileges."
+        },
+        {
+          "id": "CICD-03",
+          "tr": "Action/container/tool referansını değişmez sürümle bağla; cache/artefakt zehirlemesi ve script expression injection yollarını doğrula.",
+          "en": "Pin actions/containers/tools immutably; verify cache/artifact poisoning and script-expression injection paths."
+        },
+        {
+          "id": "CICD-04",
+          "tr": "Kod inceleme, branch/release koruması ve kontrol zorunluluğunu incele; workflow dosyası tek başına kuralın etkinliğini kanıtlamasın.",
+          "en": "Review code review, branch/release protection, and required checks; workflow files alone do not prove policy enforcement."
+        },
+        {
+          "id": "CICD-05",
+          "tr": "Skill, MCP sunucusu, eklenti ve ajan araçlarını izin/çıkış trafiği açısından incele; doküman enjeksiyonu shell veya sırlara yetki vermesin.",
+          "en": "Review skills, MCP servers, plugins, and agent tools for permissions/egress; document injection must not grant shell or secret access."
+        },
+        {
+          "id": "CICD-06",
+          "tr": "Ajanın eriştiği dosya/komut/sağlayıcı ve onay sınırlarını test et; üretim sırrı, ev dizini veya başka proje varsayılan yetki olmasın.",
+          "en": "Test agent file/command/provider and approval boundaries; production secrets, home directories, and other projects must not be implicit authority."
+        }
+      ]
+    },
+    {
+      "id": "INFRA",
+      "tr": "Altyapı ve üretim yapılandırması",
+      "en": "Infrastructure and production configuration",
+      "controls": [
+        {
+          "id": "INFRA-01",
+          "tr": "Debug, test kullanıcı, admin konsolu, health/metrics, .git/.env ve yedek yayın ayarlarını yerelde incele; gizli içerik public build'e girmesin.",
+          "en": "Review debug, test users, consoles, health/metrics, .git/.env, and backup publication locally; private content must not ship publicly."
+        },
+        {
+          "id": "INFRA-02",
+          "tr": "Container kullanıcı, capability, mount, socket ve secret katmanlarını incele; gereksiz root/privileged erişim ve gömülü sır bulunmasın.",
+          "en": "Review container users, capabilities, mounts, sockets, and secret layers; eliminate unjustified root/privileged access and embedded secrets."
+        },
+        {
+          "id": "INFRA-03",
+          "tr": "Cloud IAM, object policy, ağ, security group ve metadata erişimini yapılandırmadan değerlendir; public erişimi kanıtlamadan iddia etme.",
+          "en": "Assess cloud IAM, object policies, networks, security groups, and metadata access from configuration; do not assert public exposure without evidence."
+        },
+        {
+          "id": "INFRA-04",
+          "tr": "Staging/preview domain, eski dağıtım ve dangling DNS envanterini çıkar; hassas preview ve sahipsiz kaynakların sorumlusu belirlensin.",
+          "en": "Inventory staging/preview domains, old deployments, and dangling DNS; assign owners for sensitive previews and orphaned resources."
+        },
+        {
+          "id": "INFRA-05",
+          "tr": "Secret/config ayrımı, ortam farkı ve release modu ayarını karşılaştır; yerelde doğru kontrol üretimde kapalı kalmasın.",
+          "en": "Compare secret/config separation, environment drift, and release-mode settings; locally correct controls must not be disabled in production."
+        },
+        {
+          "id": "INFRA-06",
+          "tr": "Üretim build'ini ve dağıtılan artefakt kimliğini incele; kaynak incelemesiyle canlı sürümün aynı olduğu doğrulanmadıysa sınırlılığı yaz.",
+          "en": "Inspect production builds and deployed artifact identity; disclose when reviewed source and live release equivalence is unverified."
+        }
+      ]
+    },
+    {
+      "id": "OPS",
+      "tr": "Gözlemlenebilirlik, olay ve kurtarma",
+      "en": "Observability, incidents, and recovery",
+      "controls": [
+        {
+          "id": "OPS-01",
+          "tr": "Auth, yetki, admin, export ve ödeme olaylarını sentetik işlemle izle; sır/PII olmadan aktör, zaman, sonuç ve korelasyon kaydedilsin.",
+          "en": "Trace synthetic auth, authorization, admin, export, and payment events; record actor/time/result/correlation without secrets or PII."
+        },
+        {
+          "id": "OPS-02",
+          "tr": "Audit log erişim, değiştirilebilirlik ve saklamasını incele; ayrıcalıklı kötüye kullanım tespit edilebilir ve kayıtlar korunmuş olsun.",
+          "en": "Review audit-log access, tamper resistance, and retention; privileged misuse must be detectable and records protected."
+        },
+        {
+          "id": "OPS-03",
+          "tr": "Alarm eşiği, bildirim rotası, nöbetçi ve olay planını kontrol et; gerçek ileti göndermeden test kanıtı veya sorumlu doğrulaması ara.",
+          "en": "Check alert thresholds, routing, on-call ownership, and incident plans; obtain test evidence or owner verification without sending real alerts."
+        },
+        {
+          "id": "OPS-04",
+          "tr": "Yedek kapsamı, şifreleme, erişim, RPO/RTO ve saklamayı incele; yedek varlığını geri yükleme başarısı sayma.",
+          "en": "Review backup scope, encryption, access, RPO/RTO, and retention; backup existence is not successful restoration."
+        },
+        {
+          "id": "OPS-05",
+          "tr": "İzole sentetik geri yükleme ve rollback planını doğrula; üretim verisini ezme, ulaşılamayan kurtarma kanıtını engel olarak yaz.",
+          "en": "Verify isolated synthetic restore and rollback procedures; never overwrite production, and record unavailable recovery evidence as a blocker."
+        },
+        {
+          "id": "OPS-06",
+          "tr": "Silme/retention işlemlerinin yedek, log, cache ve arama indeksine etkisini incele; istisna ve yeniden yükleme sonrası silme politikası belirlensin.",
+          "en": "Review deletion/retention across backups, logs, caches, and search indexes; define exceptions and deletion after restoration."
+        }
+      ]
+    },
+    {
+      "id": "AI",
+      "tr": "AI, RAG ve uygulama ajanları",
+      "en": "AI, RAG, and application agents",
+      "controls": [
+        {
+          "id": "AI-01",
+          "tr": "Kullanıcı/belge/web/araç çıktısından zararsız prompt injection dene; model çıktısı yetki kaynağı veya güvenlik sınırı olmasın.",
+          "en": "Test harmless prompt injection through users/documents/web/tool output; model output must not become an authority or security boundary."
+        },
+        {
+          "id": "AI-02",
+          "tr": "Tool-call parametresini sunucuda yeniden yetkilendir; modelin istediği dosya, SQL, komut veya ödeme doğrudan çalıştırılmasın.",
+          "en": "Reauthorize tool-call parameters server-side; model-requested files, SQL, commands, and payments must not execute unchecked."
+        },
+        {
+          "id": "AI-03",
+          "tr": "RAG, vector index, embedding, sohbet cache'i ve memory'yi tenant/ACL matrisiyle test et; belge yetkisi arama ve çıktı aşamasında korunsun.",
+          "en": "Test RAG/vector indexes/embeddings/chat caches/memory against tenant ACLs; preserve document authorization at retrieval and output."
+        },
+        {
+          "id": "AI-04",
+          "tr": "Model/prompt/telemetriye gönderilen veri, eğitim kullanımı, saklama ve sağlayıcı konumunu incele; gizli veri paylaşımı gerçek davranışa dayansın.",
+          "en": "Review data sent to models/prompts/telemetry, training use, retention, and provider regions; assess sharing using actual behavior."
+        },
+        {
+          "id": "AI-05",
+          "tr": "Model çıktısının HTML/Markdown/URL/SQL/kod tüketildiği noktayı test et; çıktı güvenli şema ve bağlam kontrolünden geçsin.",
+          "en": "Test consumption of model HTML/Markdown/URLs/SQL/code; enforce safe schemas and context controls on output."
+        },
+        {
+          "id": "AI-06",
+          "tr": "Araç döngüsü, token, dosya, zaman ve harcamayı sınırla; uydurma kaynak, zehirli belge ve model sürümü değişiminde kalite/regresyon ölçülsün.",
+          "en": "Bound tool loops, tokens, files, time, and spend; measure quality/regressions for fabricated sources, poisoned documents, and model changes."
+        }
+      ]
+    },
+    {
+      "id": "PRIV",
+      "tr": "Gizlilik ve veri yaşam döngüsü",
+      "en": "Privacy and data lifecycle",
+      "controls": [
+        {
+          "id": "PRIV-01",
+          "tr": "Form, cookie, SDK, log, IP, konum ve türetilmiş veriyi haritala; amaç, alıcı, bölge, saklama ve veri rolü kaydedilsin.",
+          "en": "Map forms, cookies, SDKs, logs, IPs, location, and inferred data; record purpose, recipient, region, retention, and data roles."
+        },
+        {
+          "id": "PRIV-02",
+          "tr": "Aydınlatma/gizlilik metnini network ve kod davranışıyla karşılaştır; açıklanmayan toplama/izleme/aktarım somut kanıtla işaretlensin.",
+          "en": "Compare privacy notices with network/code behavior; evidence undisclosed collection, tracking, and transfers."
+        },
+        {
+          "id": "PRIV-03",
+          "tr": "Amaç/veri minimizasyonu ve gerekli izinleri değerlendir; her şeyi rızaya bağlama, hukuki dayanak kararını yetkili incelemeye taşı.",
+          "en": "Assess purpose/data minimization and permissions; do not require consent for everything, and route lawful-basis decisions to authorized review."
+        },
+        {
+          "id": "PRIV-04",
+          "tr": "Çerez/analitik tercihinde reddetme ve geri çekmeyi test et; tercihe tabi araçlar izin öncesi veya ret sonrası çalışmasın.",
+          "en": "Test cookie/analytics rejection and withdrawal; preference-dependent tools must not run before permission or after refusal."
+        },
+        {
+          "id": "PRIV-05",
+          "tr": "Sentetik hesapla veri erişim/export/düzeltme/silme akışını dene; kimlik doğrulansın ve başkasının verisi dışa aktarılmasın.",
+          "en": "Exercise access/export/correction/deletion with synthetic accounts; verify identity and prevent exporting another person's data."
+        },
+        {
+          "id": "PRIV-06",
+          "tr": "Çocuk, sağlık, biyometri, finans ve kesin konum verisini belirle; özel kurallar, risk değerlendirmesi ve uzman onayı ihtiyacını koşullu kaydet.",
+          "en": "Identify children, health, biometric, financial, and precise-location data; conditionally record special rules, risk assessments, and expert review needs."
+        }
+      ]
+    },
+    {
+      "id": "LEGAL",
+      "tr": "Hukuk, içerik hakları ve tüketici",
+      "en": "Legal, content rights, and consumers",
+      "controls": [
+        {
+          "id": "LEGAL-01",
+          "tr": "Şirket/operatör, hedef pazar ve hizmet modeline göre KVKK/GDPR ve diğer kuralların uygulanabilirliğini araştır; gerekçesiz uygunluk hükmü verme.",
+          "en": "Assess KVKK/GDPR and other rule applicability from operator, markets, and service model; avoid unsupported compliance conclusions."
+        },
+        {
+          "id": "LEGAL-02",
+          "tr": "Yurt dışı aktarım, işleyen sözleşmesi, alt işleyen, kayıt ve saklama yükümlülüğü sorularını resmî kaynağa bağla; yalnızca sunucu bölgesiyle hüküm verme.",
+          "en": "Link transfer, processor/subprocessor, registration, and retention questions to official sources; server location alone is not a legal conclusion."
+        },
+        {
+          "id": "LEGAL-03",
+          "tr": "İhlal planında farkındalık anı, otorite/kişi bildirim koşulu, sorumlu ve kanıt korumayı ayır; süreleri güncel uygulanabilir hükümle doğrula.",
+          "en": "Distinguish awareness, authority/person notification triggers, ownership, and evidence preservation; verify deadlines against current applicable rules."
+        },
+        {
+          "id": "LEGAL-04",
+          "tr": "Pazarlama e-posta/SMS, izin kaydı, İYS gereksinimi ve unsubscribe davranışını pazar bazında incele; işlem iletisini pazarlamayla otomatik eşitleme.",
+          "en": "Review commercial email/SMS, permission records, IYS requirements, and unsubscribe by market; do not automatically equate transactional and marketing messages."
+        },
+        {
+          "id": "LEGAL-05",
+          "tr": "Ödeme öncesi bilgi, sözleşme, fiyat/yenileme, iptal/iade ve dijital içerik istisnalarını ürün/pazar bazında incele; hukukçu sorularını somutlaştır.",
+          "en": "Review precontract information, terms, price/renewal, cancellation/refunds, and digital-content exceptions per market/product; provide concrete counsel questions."
+        },
+        {
+          "id": "LEGAL-06",
+          "tr": "Kod/medya/font/marka/model hakları, kullanıcı içeriği, şikâyet-kaldırma, mağaza beyanı ve destek bilgilerini incele; başkasının metnini izinsiz kopyalama.",
+          "en": "Review code/media/font/trademark/model rights, user content, takedowns, store disclosures, and support details; do not copy third-party text without permission."
+        }
+      ]
+    },
+    {
+      "id": "MOBILE",
+      "tr": "Mobil, masaüstü ve PWA",
+      "en": "Mobile, desktop, and PWA",
+      "controls": [
+        {
+          "id": "MOBILE-01",
+          "tr": "Android/iOS/Flutter/React Native depolamasında token, yedek, log ve clipboard'u incele; platform güvenli deposu ve logout temizliği doğrulansın.",
+          "en": "Review Android/iOS/Flutter/React Native tokens, backups, logs, and clipboard; verify platform secure storage and logout cleanup."
+        },
+        {
+          "id": "MOBILE-02",
+          "tr": "Android exported bileşen, intent, izin, debug ve network config'i test et; iOS entitlement, ATS ve permission kapsamını ayrı değerlendir.",
+          "en": "Test Android exported components, intents, permissions, debug/network config; separately assess iOS entitlements, ATS, and permission scope."
+        },
+        {
+          "id": "MOBILE-03",
+          "tr": "Deep link, universal/app link, OAuth callback ve WebView köprüsünü bozuk parametrelerle dene; origin/komut sınırı ve kimlik korunmuş olsun.",
+          "en": "Test malformed deep/universal/app links, OAuth callbacks, and WebView bridges; preserve origin/command boundaries and identity."
+        },
+        {
+          "id": "MOBILE-04",
+          "tr": "Electron/Tauri IPC, preload, node erişimi, CSP, imza ve updater'ı incele; renderer girdisi işletim sistemi yetkisi kazanmasın.",
+          "en": "Review Electron/Tauri IPC, preload, Node access, CSP, signing, and updaters; renderer input must not gain OS privileges."
+        },
+        {
+          "id": "MOBILE-05",
+          "tr": "PWA/service worker cache, offline kuyruk, update ve logout'u farklı kullanıcılarla dene; özel veri ve eski yetki oturumlar arasında kalmasın.",
+          "en": "Test PWA/service-worker caches, offline queues, updates, and logout across users; private data and stale authority must not cross sessions."
+        },
+        {
+          "id": "MOBILE-06",
+          "tr": "Cihaz/emülatörde release build, arka plan iş, medya/push ve izin reddi akışını test et; Android kanıtını iOS doğrulaması sayma.",
+          "en": "Test release builds, background work, media/push, and denied permissions on devices/emulators; Android evidence does not verify iOS."
+        }
+      ]
+    },
+    {
+      "id": "QUALITY",
+      "tr": "İşlev, erişilebilirlik ve ürün kalitesi",
+      "en": "Functionality, accessibility, and product quality",
+      "controls": [
+        {
+          "id": "QUALITY-01",
+          "tr": "Gerçek kritik yolculukları tarayıcı/cihazda uçtan uca çalıştır; buton, form, navigasyon ve backend yan etkisi beklenen sonucu versin.",
+          "en": "Run real critical journeys end-to-end in browsers/devices; buttons, forms, navigation, and backend side effects must produce expected results."
+        },
+        {
+          "id": "QUALITY-02",
+          "tr": "Boş/loading/hata/offline/timeout ve retry durumlarını dene; sahte başarı bildirimi, veri kaybı ve sonsuz spinner oluşmasın.",
+          "en": "Test empty/loading/error/offline/timeout/retry states; prevent false success, data loss, and endless spinners."
+        },
+        {
+          "id": "QUALITY-03",
+          "tr": "Telefon/tablet/masaüstü, yön değişimi, zoom ve uzun içerikle UI'ı incele; taşma, erişilemeyen kontrol ve kırık modal olmasın.",
+          "en": "Inspect phone/tablet/desktop, orientation, zoom, and long content; prevent overflow, unreachable controls, and broken modals."
+        },
+        {
+          "id": "QUALITY-04",
+          "tr": "WCAG 2.2 hedefiyle klavye, odak, label, kontrast, hata ve ekran okuyucu akışını değerlendir; otomatik taramayı tam erişilebilirlik kanıtı sayma.",
+          "en": "Assess keyboard, focus, labels, contrast, errors, and screen-reader flows against the WCAG 2.2 target; automated scanning is not full accessibility proof."
+        },
+        {
+          "id": "QUALITY-05",
+          "tr": "Dil, Türkçe karakter, tarih/saat/sayı, para birimi ve gerekiyorsa RTL'yi test et; format dönüşümü veri veya iş kuralını bozmasın.",
+          "en": "Test language, Turkish characters, dates/times/numbers, currencies, and RTL where relevant; formatting must not corrupt data or business rules."
+        },
+        {
+          "id": "QUALITY-06",
+          "tr": "Public SEO/meta/canonical/sitemap ve private noindex davranışını incele; noindex/robots'u erişim kontrolü sayma, eksik SEO'yu kritik açık yapma.",
+          "en": "Review public SEO/meta/canonical/sitemaps and private noindex behavior; robots/noindex are not access controls, and missing SEO is not a critical vulnerability."
+        }
+      ]
+    },
+    {
+      "id": "VERIFY",
+      "tr": "Performans, güvenilirlik ve denetim bütünlüğü",
+      "en": "Performance, reliability, and audit integrity",
+      "controls": [
+        {
+          "id": "VERIFY-01",
+          "tr": "N+1 sorgu, indeks, pagination, bundle, resim ve bellek kullanımını ölç; performans iddiasını ortam/baseline ve kullanıcı etkisiyle destekle.",
+          "en": "Measure N+1 queries, indexes, pagination, bundles, images, and memory; support performance claims with environment/baseline and user impact."
+        },
+        {
+          "id": "VERIFY-02",
+          "tr": "Kuyruk tekrar teslim, poison job, timeout, dead-letter ve sırayı dene; kayıp veya çift yan etki tespit edilebilir olsun.",
+          "en": "Test queue redelivery, poison jobs, timeouts, dead letters, and ordering; lost/duplicate side effects must be detectable."
+        },
+        {
+          "id": "VERIFY-03",
+          "tr": "Cache/DB/sağlayıcı arızasını kontrollü enjekte et; graceful degradation, sağlık durumu ve toparlanma veri bütünlüğünü korusun.",
+          "en": "Inject controlled cache/database/provider failures; graceful degradation, health, and recovery must preserve data integrity."
+        },
+        {
+          "id": "VERIFY-04",
+          "tr": "Mevcut testlerin assertion, skip/only, mock, kapsama ve flaky davranışını incele; yeşil rapor kritik sınırları gerçekten sınasın.",
+          "en": "Review assertions, skip/only markers, mocks, coverage, and flakiness; a green report must actually test critical boundaries."
+        },
+        {
+          "id": "VERIFY-05",
+          "tr": "Gerekli lint/typecheck/test/build ve hedefli güvenlik tekrar testini çalıştır; önceden var olan hataları yeni regresyondan ayır, başarısızlığı gizleme.",
+          "en": "Run required lint/typecheck/tests/build and targeted security retests; distinguish baseline failures from new regressions and never hide failures."
+        },
+        {
+          "id": "VERIFY-06",
+          "tr": "144 kontrol ve ekleri, kanıt referansları, benzersiz bulgu/test sayıları ve yayın kapısını çapraz doğrula; eksik kritik kanıt READY kararına dönüşmesin.",
+          "en": "Cross-check all 144 controls/extensions, evidence references, unique finding/test counts, and release gate; missing critical evidence must not become READY."
+        }
+      ]
+    }
+  ]
+}

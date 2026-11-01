@@ -1,0 +1,19 @@
+name: Validate documentation pack
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, verified 2026-11-01
+        with:
+          persist-credentials: false
+      - name: Check package consistency
+        run: node scripts/check.mjs
+      - name: Test validator failure cases
+        run: node --test scripts/check.test.mjs
